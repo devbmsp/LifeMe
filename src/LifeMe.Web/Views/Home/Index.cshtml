@@ -1,0 +1,798 @@
+﻿@{
+    ViewData["Title"] = "LifeMe";
+}
+
+<div class="app">
+    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+    <button class="sidebar-restore-btn" id="restoreSidebar" type="button" aria-controls="sidebar" aria-label="Mostrar menu lateral">☰</button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-icon">💰</div>
+            <span>LifeMe</span>
+        </div>
+
+        <button class="sidebar-nav-toggle" id="toggleSidebar" type="button" aria-controls="sidebar" aria-expanded="true">
+            <span>☰</span>
+            <strong>Recolher menu</strong>
+        </button>
+
+        <div class="profile-card">
+            <small>Controle completo</small>
+            <strong>Bruno Pires</strong>
+            <div class="profile-grid">
+                <div class="profile-metric">
+                    <span>Saldo mês</span>
+                    <b>R$ 16.028</b>
+                </div>
+                <div class="profile-metric">
+                    <span>Treinos</span>
+                    <b>4/5 semana</b>
+                </div>
+            </div>
+        </div>
+
+        <nav class="menu">
+            <div class="menu-title">Principal</div>
+            <button class="menu-item active" data-section="dashboard">📊 Dashboard</button>
+            <button class="menu-item" data-section="financeiro">💳 Finanças pessoais</button>
+            <button class="menu-item" data-section="academia">🏋️ Academia / Exercícios</button>
+            <button class="menu-item" data-section="senhas">🔐 Senhas e notas</button>
+            <button class="menu-item" data-section="perfil">👤 Perfil pessoal</button>
+            <button class="menu-item" data-section="listas">☑️ Listas para check</button>
+            <button class="menu-item" data-section="calendario">📅 Calendário</button>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <button class="btn light mobile-menu-btn" id="openSidebar" type="button" aria-controls="sidebar" aria-expanded="false">☰ Menu</button>
+            <div class="page-title">
+                <h1 id="pageTitle">Painel Geral</h1>
+                <p id="pageSubtitle">Acompanhe suas finanças, treinos, hábitos e metas em um só lugar.</p>
+            </div>
+            <div class="top-actions">
+                <input class="search-box" type="search" placeholder="Buscar lançamento, treino ou meta..." />
+                <button class="btn light" id="themeToggle" type="button">🌙 Modo escuro</button>
+                <button class="btn primary" data-section-shortcut="financeiro" type="button">+ Novo Registro</button>
+            </div>
+        </header>
+
+        <section class="section active" id="dashboard">
+            <div class="grid grid-4">
+                <article class="card stat-card green">
+                    <p class="stat-label">Receitas</p>
+                    <h2 class="stat-value" id="dashboardIncome">R$ 0,00</h2>
+                    <p class="stat-note">Receitas registradas no mês</p>
+                </article>
+
+                <article class="card stat-card red">
+                    <p class="stat-label">Despesas</p>
+                    <h2 class="stat-value" id="dashboardExpenses">R$ 0,00</h2>
+                    <p class="stat-note">Fixas, variáveis e parcelas</p>
+                </article>
+
+                <article class="card stat-card blue">
+                    <p class="stat-label">Saldo</p>
+                    <h2 class="stat-value" id="dashboardBalance">R$ 0,00</h2>
+                    <p class="stat-note">Receitas menos despesas</p>
+                </article>
+
+                <article class="card stat-card orange">
+                    <p class="stat-label">Saúde</p>
+                    <h2 class="stat-value">76,6 kg</h2>
+                    <p class="stat-note">4 treinos concluídos</p>
+                </article>
+            </div>
+
+            <div class="grid grid-2 mt-22">
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Receitas vs Despesas</h2>
+                            <p class="card-subtitle">Resumo mensal dos últimos meses</p>
+                        </div>
+                    </div>
+                    <div class="finance-chart" id="incomeExpenseChart">
+                        <div class="empty-state">Adicione registros em Financeiro para atualizar o gráfico.</div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Despesas por Categoria</h2>
+                            <p class="card-subtitle">Distribuição dos gastos do mês</p>
+                        </div>
+                    </div>
+                    <div class="donut-row">
+                        <div class="donut-wrap">
+                            <div class="donut" id="categoryDonut"></div>
+                            <div class="donut-center">
+                                <span>Total</span>
+                                <b id="categoryTotal">R$ 0</b>
+                            </div>
+                            <div class="category-tooltip" id="categoryTooltip"></div>
+                        </div>
+                        <div class="legend" id="categoryLegend">
+                            <div class="empty-state">Nenhuma despesa registrada.</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <article class="card table-card mt-22">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Transações Recentes</h2>
+                        <p class="card-subtitle">Últimos lançamentos financeiros</p>
+                    </div>
+                    <button class="btn light">Ver todas</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentTransactions">
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <section class="section" id="financeiro">
+            <article class="card finance-overview">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Overview financeiro</h2>
+                        <p class="card-subtitle">Visão geral do mês antes das segmentações</p>
+                    </div>
+                    <button class="btn light" id="toggleFinanceSegments" type="button" aria-expanded="false">Ver segmentações</button>
+                </div>
+
+                <div class="overview-grid">
+                    <div class="overview-metric income">
+                        <span>Recebimentos totais</span>
+                        <b id="financeIncome">R$ 0,00</b>
+                        <small>Fixos, variáveis e futuros do mês</small>
+                    </div>
+                    <div class="overview-metric expense">
+                        <span>Despesas totais</span>
+                        <b id="financeTotalExpenses">R$ 0,00</b>
+                        <small>Fixas, variáveis e parceladas</small>
+                    </div>
+                    <div class="overview-metric balance">
+                        <span>Saldo previsto</span>
+                        <b id="financeBalance">R$ 0,00</b>
+                        <small>Recebimentos menos despesas</small>
+                    </div>
+                    <div class="overview-metric savings">
+                        <span>Cofrinho</span>
+                        <b id="financeSavings">R$ 0,00</b>
+                        <small>Dinheiro separado para objetivos</small>
+                    </div>
+                </div>
+
+                <div class="overview-split">
+                    <div>
+                        <div class="split-top"><span>Recebimentos</span><b id="overviewIncomePercent">0%</b></div>
+                        <div class="progress-track"><div class="progress-fill" id="overviewIncomeBar"></div></div>
+                    </div>
+                    <div>
+                        <div class="split-top"><span>Despesas</span><b id="overviewExpensePercent">0%</b></div>
+                        <div class="progress-track"><div class="progress-fill danger-gradient" id="overviewExpenseBar"></div></div>
+                    </div>
+                </div>
+            </article>
+
+            <div class="finance-summary mt-22" id="financeSegments" hidden>
+                <div class="mini-info"><span>Receitas fixas</span><b id="financeFixedIncome">R$ 0,00</b></div>
+                <div class="mini-info"><span>Receitas variáveis</span><b id="financeVariableIncome">R$ 0,00</b></div>
+                <div class="mini-info"><span>Recebimentos futuros</span><b id="financeFutureIncome">R$ 0,00</b></div>
+                <div class="mini-info"><span>Despesas fixas</span><b id="financeFixed">R$ 0,00</b></div>
+                <div class="mini-info"><span>Despesas variáveis</span><b id="financeVariable">R$ 0,00</b></div>
+                <div class="mini-info"><span>Parceladas</span><b id="financeInstallments">R$ 0,00</b></div>
+            </div>
+
+            <article class="card mt-22">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Cofrinho</h2>
+                        <p class="card-subtitle">Separe dinheiro para reserva, metas ou compras planejadas</p>
+                    </div>
+                    <button class="btn primary" id="toggleSavingsForm" type="button">+ Novo Cofrinho</button>
+                </div>
+
+                <form class="form-grid savings-form" id="savingsForm" hidden>
+                    <div class="field">
+                        <label>Objetivo</label>
+                        <input id="savingsName" type="text" placeholder="Ex: Reserva de emergência" required />
+                    </div>
+                    <div class="field">
+                        <label>Valor guardado</label>
+                        <input id="savingsSaved" type="number" min="0" step="0.01" placeholder="0,00" required />
+                    </div>
+                    <div class="field">
+                        <label>Meta</label>
+                        <input id="savingsGoal" type="number" min="0" step="0.01" placeholder="5000,00" required />
+                    </div>
+                    <div class="field full form-actions">
+                        <button class="btn light" id="cancelSavingsForm" type="button">Cancelar</button>
+                        <button class="btn primary" type="submit">Guardar</button>
+                    </div>
+                </form>
+
+                <div class="grid grid-3 mt-22" id="savingsList"></div>
+            </article>
+
+            <article class="card mt-22">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Despesas</h2>
+                        <p class="card-subtitle">Fixas e variáveis organizadas para comparar o mês</p>
+                    </div>
+                    <button class="btn primary" id="toggleExpenseForm" type="button">+ Nova Despesa</button>
+                </div>
+
+                <form class="form-grid expense-form" id="expenseForm" hidden>
+                    <div class="field full">
+                        <label>Descrição</label>
+                        <input id="expenseDescription" type="text" placeholder="Ex: Aluguel, mercado, notebook..." required />
+                    </div>
+                    <div class="field">
+                        <label>Valor</label>
+                        <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0,00" required />
+                    </div>
+                    <div class="field">
+                        <label>Tipo</label>
+                        <select id="expenseType">
+                            <option value="fixed">Fixa</option>
+                            <option value="variable">Variável</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Categoria</label>
+                        <select id="expenseCategory">
+                            <option value="Moradia">Moradia</option>
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Educação">Educação</option>
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Lazer">Lazer</option>
+                        </select>
+                    </div>
+                    <div class="field expense-date-field">
+                        <label>Data do pagamento</label>
+                        <input id="expenseDate" type="date" required />
+                    </div>
+                    <div class="field expense-due-field">
+                        <label>Vencimento</label>
+                        <input id="expenseDueDay" type="number" min="1" max="31" placeholder="Dia" />
+                    </div>
+                    <div class="field full form-actions">
+                        <button class="btn light" id="cancelExpenseForm" type="button">Cancelar</button>
+                        <button class="btn primary" type="submit">Adicionar Despesa</button>
+                    </div>
+                </form>
+
+                <div class="grid grid-2 mt-22">
+                    <div>
+                        <div class="list-heading">Fixas</div>
+                        <div class="list-stack" id="fixedMonthList"></div>
+                    </div>
+                    <div>
+                        <div class="list-heading">Variáveis</div>
+                        <div class="list-stack" id="variableExpensesList"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card mt-22">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Receitas</h2>
+                        <p class="card-subtitle">Fixas, variáveis e recebimentos futuros usados no dashboard</p>
+                    </div>
+                    <button class="btn primary" id="toggleIncomeForm" type="button">+ Nova Receita</button>
+                </div>
+
+                <form class="form-grid income-form" id="incomeForm" hidden>
+                    <div class="field full">
+                        <label>Descrição</label>
+                        <input id="incomeDescription" type="text" placeholder="Ex: Salário, freelance, reembolso..." required />
+                    </div>
+                    <div class="field">
+                        <label>Valor</label>
+                        <input id="incomeAmount" type="number" min="0" step="0.01" placeholder="0,00" required />
+                    </div>
+                    <div class="field">
+                        <label>Tipo</label>
+                        <select id="incomeType">
+                            <option value="fixed">Fixa</option>
+                            <option value="variable">Variável</option>
+                            <option value="future">Recebimento futuro</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Categoria</label>
+                        <select id="incomeCategory">
+                            <option value="Salário">Salário</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Investimentos">Investimentos</option>
+                            <option value="Reembolso">Reembolso</option>
+                            <option value="Venda">Venda</option>
+                        </select>
+                    </div>
+                    <div class="field income-date-field">
+                        <label>Data do recebimento</label>
+                        <input id="incomeDate" type="date" />
+                    </div>
+                    <div class="field income-due-field">
+                        <label>Dia recorrente</label>
+                        <input id="incomeDueDay" type="number" min="1" max="31" placeholder="Dia" />
+                    </div>
+                    <div class="field income-future-field">
+                        <label>Data prevista</label>
+                        <input id="incomeFutureDate" type="date" />
+                    </div>
+                    <div class="field full form-actions">
+                        <button class="btn light" id="cancelIncomeForm" type="button">Cancelar</button>
+                        <button class="btn primary" type="submit">Adicionar Receita</button>
+                    </div>
+                </form>
+
+                <div class="grid grid-3 mt-22">
+                    <div>
+                        <div class="list-heading">Fixas</div>
+                        <div class="list-stack" id="fixedIncomeList"></div>
+                    </div>
+                    <div>
+                        <div class="list-heading">Variáveis</div>
+                        <div class="list-stack" id="variableIncomeList"></div>
+                    </div>
+                    <div>
+                        <div class="list-heading">Futuras</div>
+                        <div class="list-stack" id="futureIncomeList"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card mt-22">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Parcelamentos</h2>
+                        <p class="card-subtitle">Cadastre compras parceladas e acompanhe as parcelas do mês</p>
+                    </div>
+                    <button class="btn primary" id="toggleInstallmentForm" type="button">+ Novo Parcelamento</button>
+                </div>
+
+                <form class="form-grid installment-form" id="installmentForm" hidden>
+                    <div class="field full">
+                        <label>Descrição</label>
+                        <input id="installmentDescription" type="text" placeholder="Ex: Notebook, curso, celular..." required />
+                    </div>
+                    <div class="field">
+                        <label>Valor total</label>
+                        <input id="installmentAmount" type="number" min="0" step="0.01" placeholder="0,00" required />
+                    </div>
+                    <div class="field">
+                        <label>Categoria</label>
+                        <select id="installmentCategory">
+                            <option value="Moradia">Moradia</option>
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Educação">Educação</option>
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Lazer">Lazer</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Nº de parcelas</label>
+                        <input id="installmentCount" type="number" min="1" placeholder="12" required />
+                    </div>
+                    <div class="field">
+                        <label>1ª parcela</label>
+                        <input id="installmentStart" type="date" required />
+                    </div>
+                    <div class="field full form-actions">
+                        <button class="btn light" id="cancelInstallmentForm" type="button">Cancelar</button>
+                        <button class="btn primary" type="submit">Adicionar Parcelamento</button>
+                    </div>
+                </form>
+
+                <div class="grid grid-2 mt-22">
+                    <div>
+                        <div class="list-heading">Parcelas do mês</div>
+                        <div class="list-stack" id="installmentsMonthList"></div>
+                    </div>
+                    <div>
+                        <div class="list-heading">Acompanhamento</div>
+                        <div class="progress-list" id="installmentsList"></div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="section" id="academia">
+            <div class="grid grid-4">
+                <article class="card stat-card green">
+                    <p class="stat-label">Peso Atual</p>
+                    <h2 class="stat-value">76,6 kg</h2>
+                    <p class="stat-note">Meta: 84,6 kg</p>
+                </article>
+                <article class="card stat-card blue">
+                    <p class="stat-label">Músculo</p>
+                    <h2 class="stat-value">49,6%</h2>
+                    <p class="stat-note">Ganho planejado: +7kg</p>
+                </article>
+                <article class="card stat-card red">
+                    <p class="stat-label">Gordura</p>
+                    <h2 class="stat-value">13,6%</h2>
+                    <p class="stat-note">Meta: perder 4kg</p>
+                </article>
+                <article class="card stat-card orange">
+                    <p class="stat-label">Calorias</p>
+                    <h2 class="stat-value">2697</h2>
+                    <p class="stat-note">Mínimo diário estimado</p>
+                </article>
+            </div>
+
+            <div class="grid grid-2 mt-22">
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Treino da Semana</h2>
+                            <p class="card-subtitle">Controle de peito, tríceps, ombro, perna, costas e bíceps</p>
+                        </div>
+                    </div>
+                    <div class="progress-list">
+                        <div class="progress-item"><div class="progress-top"><span>Peito + Tríceps</span><b>Concluído</b></div><div class="progress-track"><div class="progress-fill w-100"></div></div></div>
+                        <div class="progress-item"><div class="progress-top"><span>Ombro + Mobilidade</span><b>Concluído</b></div><div class="progress-track"><div class="progress-fill w-100"></div></div></div>
+                        <div class="progress-item"><div class="progress-top"><span>Perna + Explosão Vôlei</span><b>75%</b></div><div class="progress-track"><div class="progress-fill w-75"></div></div></div>
+                        <div class="progress-item"><div class="progress-top"><span>Costas + Bíceps</span><b>Pendente</b></div><div class="progress-track"><div class="progress-fill w-0"></div></div></div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Registro de Bioimpedância</h2>
+                            <p class="card-subtitle">Acompanhe evolução corporal</p>
+                        </div>
+                    </div>
+                    <form class="form-grid">
+                        <div class="field"><label>Peso</label><input type="number" placeholder="76.6" /></div>
+                        <div class="field"><label>Gordura %</label><input type="number" placeholder="13.6" /></div>
+                        <div class="field"><label>Músculo %</label><input type="number" placeholder="49.6" /></div>
+                        <div class="field"><label>Água L</label><input type="number" placeholder="48.7" /></div>
+                        <div class="field full"><label>Observações do treino</label><textarea placeholder="Dor no ombro, carga, desempenho..."></textarea></div>
+                        <div class="field full"><button class="btn primary" type="button">Salvar Evolução</button></div>
+                    </form>
+                </article>
+            </div>
+
+            <article class="card mt-22">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Treino do Dia</h2>
+                        <p class="card-subtitle">Monte uma tabela editável com exercícios, reps, descanso e carga</p>
+                    </div>
+                    <button class="btn primary" id="toggleWorkoutForm" type="button">+ Criar Treino</button>
+                </div>
+
+                <form class="form-grid workout-form" id="workoutForm" hidden>
+                    <div class="field">
+                        <label>Grupo / treino</label>
+                        <input id="workoutName" type="text" value="Peito" required />
+                    </div>
+                    <div class="field">
+                        <label>Exercício</label>
+                        <input id="exerciseName" type="text" placeholder="Ex: Supino reto" required />
+                    </div>
+                    <div class="field">
+                        <label>Reps</label>
+                        <input id="exerciseReps" type="text" placeholder="4x10" required />
+                    </div>
+                    <div class="field">
+                        <label>Descanso</label>
+                        <input id="exerciseRest" type="text" placeholder="90s" required />
+                    </div>
+                    <div class="field">
+                        <label>Carga</label>
+                        <input id="exerciseLoad" type="text" placeholder="40 kg" required />
+                    </div>
+                    <div class="field full form-actions">
+                        <button class="btn light" id="cancelWorkoutForm" type="button">Fechar</button>
+                        <button class="btn primary" type="submit">Adicionar Exercício</button>
+                    </div>
+                </form>
+
+                <div class="table-wrap workout-table-wrap">
+                    <table class="workout-table">
+                        <thead>
+                            <tr>
+                                <th id="workoutTableTitle">Peito</th>
+                                <th>Reps</th>
+                                <th>Descanso</th>
+                                <th>Carga</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workoutTableBody"></tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <section class="section" id="senhas">
+            <div class="grid grid-2">
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Cofre de Senhas</h2>
+                            <p class="card-subtitle">Modelo visual para organizar acessos importantes</p>
+                        </div>
+                        <button class="btn primary" type="button">+ Nova Senha</button>
+                    </div>
+                    <div class="list-stack">
+                        <div class="secure-item">
+                            <div>
+                                <strong>Banco Principal</strong>
+                                <span>bruno@email.com • atualizado hoje</span>
+                            </div>
+                            <span class="badge scheduled">Protegido</span>
+                        </div>
+                        <div class="secure-item">
+                            <div>
+                                <strong>GitHub</strong>
+                                <span>2FA ativo • token salvo</span>
+                            </div>
+                            <span class="badge paid">Seguro</span>
+                        </div>
+                        <div class="secure-item">
+                            <div>
+                                <strong>Conta Google</strong>
+                                <span>Recuperação por telefone configurada</span>
+                            </div>
+                            <span class="badge pending">Revisar</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Bloco de Notas</h2>
+                            <p class="card-subtitle">Anotações rápidas e privadas do dia a dia</p>
+                        </div>
+                    </div>
+                    <form class="form-grid">
+                        <div class="field full">
+                            <label>Título</label>
+                            <input type="text" placeholder="Ex: Ideias do projeto" />
+                        </div>
+                        <div class="field full">
+                            <label>Nota</label>
+                            <textarea placeholder="Escreva lembretes, links ou observações..."></textarea>
+                        </div>
+                        <div class="field full">
+                            <button class="btn primary" type="button">Adicionar Nota</button>
+                        </div>
+                    </form>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="perfil">
+            <div class="grid grid-4">
+                <article class="card stat-card blue">
+                    <p class="stat-label">Altura</p>
+                    <h2 class="stat-value">1,78 m</h2>
+                    <p class="stat-note">Informação pessoal</p>
+                </article>
+                <article class="card stat-card green">
+                    <p class="stat-label">Peso</p>
+                    <h2 class="stat-value">76,6 kg</h2>
+                    <p class="stat-note">Última medição</p>
+                </article>
+                <article class="card stat-card red">
+                    <p class="stat-label">Tipo Sanguíneo</p>
+                    <h2 class="stat-value">O+</h2>
+                    <p class="stat-note">Dado médico básico</p>
+                </article>
+                <article class="card stat-card orange">
+                    <p class="stat-label">Idade</p>
+                    <h2 class="stat-value">22 anos</h2>
+                    <p class="stat-note">Perfil do usuário</p>
+                </article>
+            </div>
+
+            <article class="card mt-22">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Informações Pessoais</h2>
+                        <p class="card-subtitle">Estrutura visual para dados básicos do perfil</p>
+                    </div>
+                </div>
+                <form class="form-grid">
+                    <div class="field"><label>Nome</label><input type="text" value="Bruno Pires" /></div>
+                    <div class="field"><label>Data de nascimento</label><input type="date" /></div>
+                    <div class="field"><label>Altura</label><input type="text" value="1,78 m" /></div>
+                    <div class="field"><label>Peso</label><input type="text" value="76,6 kg" /></div>
+                    <div class="field"><label>Tipo sanguíneo</label><input type="text" value="O+" /></div>
+                    <div class="field"><label>Contato de emergência</label><input type="text" placeholder="Nome e telefone" /></div>
+                    <div class="field full"><button class="btn primary" type="button">Salvar Perfil</button></div>
+                </form>
+            </article>
+        </section>
+
+        <section class="section" id="listas">
+            <div class="grid grid-3">
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Hoje</h2>
+                            <p class="card-subtitle">Tarefas rápidas</p>
+                        </div>
+                    </div>
+                    <div class="check-list">
+                        <label><input type="checkbox" checked /> Revisar gastos do dia</label>
+                        <label><input type="checkbox" /> Beber 3L de água</label>
+                        <label><input type="checkbox" /> Treino de perna</label>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Compras</h2>
+                            <p class="card-subtitle">Lista para mercado e casa</p>
+                        </div>
+                    </div>
+                    <div class="check-list">
+                        <label><input type="checkbox" /> Frango</label>
+                        <label><input type="checkbox" /> Arroz</label>
+                        <label><input type="checkbox" checked /> Café</label>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Projetos</h2>
+                            <p class="card-subtitle">Pendências pessoais</p>
+                        </div>
+                    </div>
+                    <div class="check-list">
+                        <label><input type="checkbox" /> Conectar banco</label>
+                        <label><input type="checkbox" /> Criar entidades DDD</label>
+                        <label><input type="checkbox" /> Planejar autenticação</label>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="calendario">
+            <div class="grid grid-2">
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Calendário</h2>
+                            <p class="card-subtitle">Visão mensal simplificada</p>
+                        </div>
+                    </div>
+                    <div class="calendar-grid">
+                        <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
+                        <b>1</b><b>2</b><b class="has-event">3</b><b>4</b><b>5</b><b>6</b><b>7</b>
+                        <b>8</b><b>9</b><b>10</b><b class="has-event">11</b><b>12</b><b>13</b><b>14</b>
+                        <b>15</b><b>16</b><b>17</b><b>18</b><b class="has-event">19</b><b>20</b><b>21</b>
+                        <b>22</b><b>23</b><b>24</b><b>25</b><b>26</b><b>27</b><b>28</b>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Lembretes</h2>
+                            <p class="card-subtitle">Compromissos e vencimentos próximos</p>
+                        </div>
+                        <button class="btn primary" type="button">+ Lembrete</button>
+                    </div>
+                    <div class="list-stack">
+                        <div class="finance-item"><div class="finance-item-top"><div><div class="finance-item-title">Pagar internet</div><div class="finance-item-meta">Dia 10 • Financeiro</div></div><span class="badge scheduled">Agendado</span></div></div>
+                        <div class="finance-item"><div class="finance-item-top"><div><div class="finance-item-title">Consulta médica</div><div class="finance-item-meta">Dia 19 • Saúde</div></div><span class="badge pending">Confirmar</span></div></div>
+                        <div class="finance-item"><div class="finance-item-top"><div><div class="finance-item-title">Treino de avaliação</div><div class="finance-item-meta">Dia 3 • Academia</div></div><span class="badge paid">Pronto</span></div></div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="vida">
+            <div class="grid grid-3">
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Hábitos</h2>
+                            <p class="card-subtitle">Semana atual</p>
+                        </div>
+                    </div>
+                    <div class="habit-grid">
+                        <div class="habit-day done">S</div>
+                        <div class="habit-day done">T</div>
+                        <div class="habit-day done">Q</div>
+                        <div class="habit-day">Q</div>
+                        <div class="habit-day done">S</div>
+                        <div class="habit-day">S</div>
+                        <div class="habit-day">D</div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Água</h2>
+                            <p class="card-subtitle">Meta diária</p>
+                        </div>
+                    </div>
+                    <h2 class="stat-value blue">2,1 / 3L</h2>
+                    <div class="progress-track"><div class="progress-fill w-70 water-gradient"></div></div>
+                </article>
+
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Estudos</h2>
+                            <p class="card-subtitle">Back-end, inglês e projetos</p>
+                        </div>
+                    </div>
+                    <h2 class="stat-value purple">8h</h2>
+                    <p class="stat-note">Meta semanal: 12h</p>
+                    <div class="progress-track mt-16"><div class="progress-fill w-66 study-gradient"></div></div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="configuracoes">
+            <article class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Configurações do App</h2>
+                        <p class="card-subtitle">Personalize categorias, metas e preferências</p>
+                    </div>
+                </div>
+                <form class="form-grid">
+                    <div class="field">
+                        <label>Nome do app</label>
+                        <input type="text" value="LifeMe" />
+                    </div>
+                    <div class="field">
+                        <label>Moeda padrão</label>
+                        <select><option>BRL - Real Brasileiro</option><option>USD - Dólar</option></select>
+                    </div>
+                    <div class="field">
+                        <label>Meta de economia mensal</label>
+                        <input type="number" placeholder="5000" />
+                    </div>
+                    <div class="field">
+                        <label>Meta de treinos por semana</label>
+                        <input type="number" placeholder="5" />
+                    </div>
+                    <div class="field full">
+                        <label>Categorias principais</label>
+                        <textarea>Moradia, Alimentação, Saúde, Transporte, Educação, Lazer, Investimentos, Academia</textarea>
+                    </div>
+                    <div class="field full">
+                        <button class="btn primary" type="button">Salvar Configurações</button>
+                    </div>
+                </form>
+            </article>
+        </section>
+    </main>
+</div>
